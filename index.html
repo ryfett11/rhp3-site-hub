@@ -107,4 +107,571 @@
                         ✍️
                     </div>
                     <div>
-                        <h3 class="text-lg
+                        <h3 class="text-lg font-bold text-slate-800">HSE & RAMS Sign-Off</h3>
+                        <p class="text-xs text-slate-500 mt-1">Daily briefing, RAMS check & digital signature.</p>
+                    </div>
+                </button>
+
+                <!-- Issue / Near Miss -->
+                <button onclick="openModal('issueModal')" class="bg-white hover:bg-rose-50 border-2 border-slate-200 hover:border-rose-400 rounded-2xl p-6 text-left shadow-md transition group flex items-center gap-4 md:col-span-2">
+                    <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Report Issue / Near-Miss</h3>
+                        <p class="text-xs text-slate-500 mt-1">Flag utility strikes, ground slippage, or equipment faults instantly.</p>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Office Hub Dashboard (Hidden until PIN entered) -->
+        <div id="officeHubView" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-industrial-dark text-white p-4 rounded-xl shadow">
+                <h2 class="text-lg font-bold flex items-center gap-2"><span>📊</span> Office Control Panel</h2>
+                <button onclick="lockOfficeHub()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-bold transition">Lock Hub</button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-slate-300 gap-2">
+                <button onclick="switchTab('submissionsTab')" id="btnSubmissionsTab" class="px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm">Incoming Feed</button>
+                <button onclick="switchTab('sitesTab')" id="btnSitesTab" class="px-4 py-2 font-bold text-slate-500 text-sm">Manage Sites</button>
+            </div>
+
+            <!-- Submissions Feed Tab -->
+            <div id="submissionsTab" class="space-y-4">
+                <div class="bg-white p-4 rounded-xl shadow flex flex-col md:flex-row gap-3 justify-between items-center">
+                    <div class="flex items-center gap-2 w-full md:w-auto">
+                        <span class="text-sm font-bold text-slate-700">Filter Site:</span>
+                        <select id="filterSite" onchange="renderSubmissions()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm flex-1">
+                            <option value="ALL">All Sites</option>
+                        </select>
+                    </div>
+                    <button onclick="exportSiteReportPDF()" class="bg-industrial-500 hover:bg-industrial-600 text-white font-bold px-4 py-2.5 rounded-lg text-sm shadow flex items-center gap-2 transition w-full md:w-auto justify-center">
+                        <span>📄</span> Download Client/Auditor PDF Report
+                    </button>
+                </div>
+                <div id="submissionsList" class="space-y-3">
+                    <!-- Dynamic submission cards injected here -->
+                </div>
+            </div>
+
+            <!-- Manage Sites Tab -->
+            <div id="sitesTab" class="hidden space-y-4">
+                <div class="bg-white p-5 rounded-xl shadow space-y-4">
+                    <h3 class="font-bold text-slate-800">Add New Groundworks Site</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Site Name / Plot Reference:</label>
+                            <input type="text" id="newSiteName" placeholder="e.g., Lord Street Development" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-industrial-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Postcode or Google Maps Link:</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="newSiteMap" placeholder="e.g., L33 7XW or paste maps link" class="flex-1 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-industrial-500">
+                                <a href="https://maps.google.com" target="_blank" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-3 py-2 rounded-lg text-xs flex items-center gap-1 transition">
+                                    📍 Open Maps to Drop Pin
+                                </a>
+                            </div>
+                        </div>
+                        <button onclick="addNewSite()" class="w-full bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-lg text-sm shadow transition">
+                            Save & Add Site
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow">
+                    <h3 class="font-bold text-slate-800 mb-3">Active Sites List</h3>
+                    <div id="adminSitesList" class="space-y-2">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer with Secret Triple-Tap Unlock -->
+    <footer class="mt-auto py-6 text-center text-xs text-slate-400 select-none cursor-pointer" onclick="handleFooterTap()">
+        RHP3 Groundworks & Surfacing Contractor &copy; 2026
+    </footer>
+
+    <!-- Modal: PIN Entry -->
+    <div id="pinModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800 text-center">Enter Office PIN</h3>
+            <p class="text-xs text-slate-500 text-center">Default PIN is <code class="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-industrial-600">1234</code></p>
+            <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-full text-center tracking-widest text-2xl border border-slate-300 rounded-xl py-3 focus:ring-2 focus:ring-industrial-500">
+            <div class="flex gap-2">
+                <button onclick="closeModal('pinModal')" class="flex-1 bg-slate-200 hover:bg-slate-300 font-bold py-2.5 rounded-xl text-sm transition">Cancel</button>
+                <button onclick="verifyPin()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow transition">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Progress Photo -->
+    <div id="photoModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800">📸 Take Progress Photos</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Capture or Select Photos (Multiple allowed):</label>
+                    <input type="file" accept="image/*" capture="environment" multiple id="photoFileInput" class="w-full border border-slate-300 rounded-lg p-2 text-sm bg-slate-50 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-industrial-100 file:text-industrial-700 hover:file:bg-industrial-200">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Work Description / Notes:</label>
+                    <textarea id="photoNotes" rows="3" placeholder="e.g., Completed 150mm foul drainage run to manhole 3." class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-industrial-500"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('photoModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitProgressPhoto()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">Send to Office</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: HSE Form -->
+    <div id="hseModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800">✍️ Daily HSE & RAMS Sign-Off</h3>
+            <div class="space-y-3 text-sm">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse1" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>RAMS read and understood for today's tasks.</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse2" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>Excavation/Trench shoring and CAT & Genny checks completed.</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse3" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>PPE worn correctly (Hi-Vis, boots, hard hat, glasses).</span>
+                </label>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Digital Signature (Type Full Name):</label>
+                    <input type="text" id="hseSignName" placeholder="Signer Name" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('hseModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitHSEForm()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">Sign & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Issue / Near-Miss -->
+    <div id="issueModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-rose-600">⚠️ Report Issue / Near-Miss</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Describe Issue:</label>
+                    <textarea id="issueNotes" rows="3" placeholder="Describe hazard, service strike risk, or plant fault..." class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-rose-500"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('issueModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitIssue()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-sm shadow">Send Urgent Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Initial Mock Data / LocalStorage State
+        let sites = JSON.parse(localStorage.getItem('rhp3_sites')) || [
+            { name: "Lord Street Development", map: "https://maps.google.com/?q=Burscough" },
+            { name: "Plot 4 Drainage Run", map: "https://maps.google.com" }
+        ];
+
+        let submissions = JSON.parse(localStorage.getItem('rhp3_submissions')) || [];
+        const officePin = "1234";
+
+        // Footer Triple-Tap Secret State
+        let footerTapCount = 0;
+        let footerTapTimer = null;
+
+        function handleFooterTap() {
+            footerTapCount++;
+            clearTimeout(footerTapTimer);
+            if (footerTapCount >= 3) {
+                footerTapCount = 0;
+                openAdminModal();
+            } else {
+                footerTapTimer = setTimeout(() => { footerTapCount = 0; }, 1000);
+            }
+        }
+
+        // Show On-Screen Success Banner
+        function showSuccessBanner(message) {
+            const banner = document.getElementById('successBanner');
+            const bannerText = document.getElementById('successBannerText');
+            bannerText.innerText = message;
+            banner.classList.remove('hidden');
+            banner.classList.add('flex');
+            setTimeout(() => {
+                banner.classList.remove('flex');
+                banner.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Initialize app on load
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('admin') === 'true') {
+                const adminBtn = document.getElementById('adminHeaderBtn');
+                adminBtn.classList.remove('hidden');
+                adminBtn.classList.add('flex');
+            }
+
+            populateSitesDropdown();
+            renderAdminSites();
+            renderSubmissions();
+        };
+
+        function populateSitesDropdown() {
+            const select = document.getElementById('activeSiteSelect');
+            const filter = document.getElementById('filterSite');
+            
+            let siteOpts = '<option value="">-- Choose Site --</option>';
+            let filterOpts = '<option value="ALL">All Sites</option>';
+
+            sites.forEach(s => {
+                siteOpts += `<option value="${s.name}">${s.name}</option>`;
+                filterOpts += `<option value="${s.name}">${s.name}</option>`;
+            });
+
+            select.innerHTML = siteOpts;
+            filter.innerHTML = filterOpts;
+        }
+
+        function updateSiteNavigation() {
+            const selectedName = document.getElementById('activeSiteSelect').value;
+            const navBtn = document.getElementById('navLinkBtn');
+            const found = sites.find(s => s.name === selectedName);
+
+            if (found && found.map) {
+                navBtn.href = found.map.startsWith('http') ? found.map : `https://maps.google.com/?q=${encodeURIComponent(found.map)}`;
+                navBtn.classList.remove('bg-slate-200', 'text-slate-500', 'pointer-events-none');
+                navBtn.classList.add('bg-industrial-500', 'text-white');
+            } else {
+                navBtn.href = "#";
+                navBtn.classList.add('bg-slate-200', 'text-slate-500', 'pointer-events-none');
+                navBtn.classList.remove('bg-industrial-500', 'text-white');
+            }
+        }
+
+        function checkWorkerAndSite() {
+            const worker = document.getElementById('workerNameSelect').value;
+            const site = document.getElementById('activeSiteSelect').value;
+            if (!worker) {
+                alert("Please select your worker name from the dropdown first.");
+                return false;
+            }
+            if (!site) {
+                alert("Please select the active site first.");
+                return false;
+            }
+            return { worker, site };
+        }
+
+        // Modal Controls
+        function openModal(id) { 
+            const check = checkWorkerAndSite();
+            if (!check) return; 
+            document.getElementById(id).classList.remove('hidden'); 
+            document.getElementById(id).classList.add('flex'); 
+        }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+        // PIN & Office Hub
+        function openAdminModal() { openModalPin(); }
+        function openModalPin() { document.getElementById('pinModal').classList.remove('hidden'); document.getElementById('pinModal').classList.add('flex'); }
+        
+        function verifyPin() {
+            const val = document.getElementById('pinInput').value;
+            if (val === officePin) {
+                closeModal('pinModal');
+                document.getElementById('pinInput').value = '';
+                document.getElementById('fieldAppView').classList.add('hidden');
+                document.getElementById('officeHubView').classList.remove('hidden');
+                const adminBtn = document.getElementById('adminHeaderBtn');
+                adminBtn.classList.remove('hidden');
+                adminBtn.classList.add('flex');
+            } else {
+                alert("Incorrect PIN code.");
+            }
+        }
+        function lockOfficeHub() {
+            document.getElementById('officeHubView').classList.add('hidden');
+            document.getElementById('fieldAppView').classList.remove('hidden');
+        }
+
+        // Tabs in Office Hub
+        function switchTab(tabId) {
+            document.getElementById('submissionsTab').classList.add('hidden');
+            document.getElementById('sitesTab').classList.add('hidden');
+            document.getElementById('btnSubmissionsTab').className = "px-4 py-2 font-bold text-slate-500 text-sm";
+            document.getElementById('btnSitesTab').className = "px-4 py-2 font-bold text-slate-500 text-sm";
+
+            document.getElementById(tabId).classList.remove('hidden');
+            if(tabId === 'submissionsTab') {
+                document.getElementById('btnSubmissionsTab').className = "px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm";
+                renderSubmissions();
+            } else {
+                document.getElementById('btnSitesTab').className = "px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm";
+                renderAdminSites();
+            }
+        }
+
+        // Submissions Logic
+        function saveSubmission(type, details, photos = []) {
+            const check = checkWorkerAndSite();
+            if (!check) return false;
+
+            const record = {
+                id: Date.now(),
+                type: type,
+                worker: check.worker,
+                site: check.site,
+                time: new Date().toLocaleString(),
+                details: details,
+                photos: photos
+            };
+
+            submissions.unshift(record);
+            localStorage.setItem('rhp3_submissions', JSON.stringify(submissions));
+            showSuccessBanner(`${type} logged successfully for ${check.site}`);
+            return true;
+        }
+
+        function submitProgressPhoto() {
+            const notes = document.getElementById('photoNotes').value;
+            const fileInput = document.getElementById('photoFileInput');
+            
+            if (fileInput.files.length === 0) {
+                alert("Please take or select at least one photo.");
+                return;
+            }
+
+            let filesProcessed = 0;
+            let photoDataUrls = [];
+
+            Array.from(fileInput.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoDataUrls.push(e.target.result);
+                    filesProcessed++;
+                    if (filesProcessed === fileInput.files.length) {
+                        if(saveSubmission('Progress Photo', notes || 'Progress photos submitted', photoDataUrls)) {
+                            document.getElementById('photoNotes').value = '';
+                            fileInput.value = '';
+                            closeModal('photoModal');
+                            renderSubmissions();
+                        }
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function submitHSEForm() {
+            const signer = document.getElementById('hseSignName').value;
+            if(!signer) { alert("Please type your full name for digital signature."); return; }
+            if(saveSubmission('HSE Sign-Off', `RAMS & Safety Checked. Signed by: ${signer}`)) {
+                document.getElementById('hseSignName').value = '';
+                document.getElementById('hse1').checked = false;
+                document.getElementById('hse2').checked = false;
+                document.getElementById('hse3').checked = false;
+                closeModal('hseModal');
+                renderSubmissions();
+            }
+        }
+
+        function submitIssue() {
+            const notes = document.getElementById('issueNotes').value;
+            if(!notes) { alert("Please describe the issue or near-miss."); return; }
+            if(saveSubmission('URGENT ISSUE', notes)) {
+                document.getElementById('issueNotes').value = '';
+                closeModal('issueModal');
+                renderSubmissions();
+            }
+        }
+
+        // Export PDF Report for Clients / Auditors using jsPDF
+        function exportSiteReportPDF() {
+            const filter = document.getElementById('filterSite').value;
+            let filtered = submissions;
+            if(filter !== 'ALL') {
+                filtered = submissions.filter(s => s.site === filter);
+            }
+
+            if(filtered.length === 0) {
+                alert("No submissions found for the selected site to export.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let y = 15;
+            // Title Header
+            doc.setFillColor(30, 41, 59); // Slate dark
+            doc.rect(0, 0, 210, 25, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(16);
+            doc.text("RHP3 HUB - SITE AUDIT & PROGRESS REPORT", 14, 16);
+
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            y = 35;
+            doc.setTextColor(50, 50, 50);
+            doc.text(`Site Filter: ${filter}`, 14, y);
+            doc.text(`Generated On: ${new Date().toLocaleString()}`, 14, y + 6);
+            doc.text(`Total Records: ${filtered.length}`, 14, y + 12);
+
+            y = 55;
+
+            filtered.forEach((item, index) => {
+                if(y > 260) {
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFillColor(241, 245, 249);
+                doc.rect(14, y, 182, 10, 'F');
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.setTextColor(249, 115, 22); // Orange
+                doc.text(`[${item.type}] - ${item.site}`, 18, y + 7);
+
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`${item.time}`, 150, y + 7);
+
+                y += 14;
+                doc.setTextColor(50, 50, 50);
+                doc.text(`Operative: ${item.worker}`, 18, y);
+                y += 6;
+
+                // Split long notes to fit page width
+                const splitNotes = doc.splitTextToSize(`Details: ${item.details}`, 174);
+                doc.text(splitNotes, 18, y);
+                y += (splitNotes.length * 5) + 4;
+
+                // If photos exist, add note in PDF
+                if(item.photos && item.photos.length > 0) {
+                    doc.setTextColor(15, 118, 110);
+                    doc.text(`[Attached Photos: ${item.photos.length} photo(s) securely logged in system]`, 18, y);
+                    y += 8;
+                }
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(14, y, 196, y);
+                y += 8;
+            });
+
+            // Save PDF
+            const filename = `RHP3_Audit_Report_${filter.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
+            doc.save(filename);
+            showSuccessBanner("PDF Report downloaded successfully!");
+        }
+
+        function renderSubmissions() {
+            const container = document.getElementById('submissionsList');
+            const filter = document.getElementById('filterSite').value;
+            
+            let filtered = submissions;
+            if(filter !== 'ALL') {
+                filtered = submissions.filter(s => s.site === filter);
+            }
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow text-center text-slate-400 text-sm">No submissions recorded yet.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const badgeColor = item.type === 'URGENT ISSUE' ? 'bg-rose-100 text-rose-700 border-rose-300' : 'bg-industrial-100 text-industrial-700 border-industrial-300';
+                
+                let photosHtml = '';
+                if(item.photos && item.photos.length > 0) {
+                    photosHtml += `<div class="flex gap-2 overflow-x-auto py-2">`;
+                    item.photos.forEach(pUrl => {
+                        photosHtml += `<a href="${pUrl}" target="_blank"><img src="${pUrl}" class="w-20 h-20 object-cover rounded-lg border shadow-sm hover:opacity-90 transition"></a>`;
+                    });
+                    photosHtml += `</div>`;
+                }
+
+                html += `
+                    <div class="bg-white p-4 rounded-xl shadow border-l-4 ${item.type === 'URGENT ISSUE' ? 'border-rose-500' : 'border-industrial-500'} space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded border ${badgeColor}">${item.type}</span>
+                            <span class="text-xs text-slate-400">${item.time}</span>
+                        </div>
+                        <div class="text-sm font-bold text-slate-800">📍 ${item.site}</div>
+                        <div class="text-sm text-slate-600 bg-slate-50 p-2.5 rounded">${item.details}</div>
+                        ${photosHtml}
+                        <div class="text-xs font-medium text-slate-500">👷 Submitted by: <strong class="text-slate-700">${item.worker}</strong></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // Site Management Logic
+        function addNewSite() {
+            const name = document.getElementById('newSiteName').value.trim();
+            const mapInput = document.getElementById('newSiteMap').value.trim();
+            if(!name) { alert("Please enter a site name."); return; }
+
+            let mapUrl = mapInput;
+            if(mapInput && !mapInput.startsWith('http')) {
+                mapUrl = `https://maps.google.com/?q=${encodeURIComponent(mapInput)}`;
+            }
+
+            sites.push({ name, map: mapUrl });
+            localStorage.setItem('rhp3_sites', JSON.stringify(sites));
+            document.getElementById('newSiteName').value = '';
+            document.getElementById('newSiteMap').value = '';
+            populateSitesDropdown();
+            renderAdminSites();
+            showSuccessBanner(`New site "${name}" added successfully!`);
+        }
+
+        function renderAdminSites() {
+            const container = document.getElementById('adminSitesList');
+            if(sites.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">No active sites configured.</p>`;
+                return;
+            }
+            let html = '';
+            sites.forEach((s, index) => {
+                html += `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border text-sm">
+                        <div>
+                            <strong class="text-slate-800">${s.name}</strong>
+                            <div class="text-xs text-industrial-600 underline truncate max-w-xs"><a href="${s.map}" target="_blank">${s.map || 'No map link'}</a></div>
+                        </div>
+                        <button onclick="deleteSite(${index})" class="text-rose-500 hover:text-rose-700 font-bold text-xs px-2 py-1">Remove</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteSite(index) {
+            if(confirm("Remove this site?")) {
+                sites.splice(index, 1);
+                localStorage.setItem('rhp3_sites', JSON.stringify(sites));
+                populateSitesDropdown();
+                renderAdminSites();
+            }
+        }
+    </script>
+</body>
+</html>
