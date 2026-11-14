@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RHP3 Hub - Site Management</title>
+    <!-- Tailwind CSS for clean, responsive mobile-first styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            500: '#f97316', // Industrial Orange
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            dark: '#1e293b',  // Slate Grey
+                            darker: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="bg-industrial-dark text-white shadow-md border-b-4 border-industrial-500">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black tracking-wider flex items-center gap-2">
+                    <span class="bg-industrial-500 text-white px-2 py-0.5 rounded text-lg">RHP3</span> Hub
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">Groundworks & Surfacing Management</p>
+            </div>
+            <button onclick="openAdminModal()" class="bg-slate-700 hover:bg-slate-600 text-industrial-100 border border-slate-600 text-xs font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-inner transition">
+                <span>🔒</span> Office Hub
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 md:p-6 pb-20">
+        
+        <!-- Field App View (Default) -->
+        <div id="fieldAppView" class="space-y-6">
+            
+            <!-- Site Selection Banner -->
+            <div class="bg-white rounded-xl shadow-md p-5 border-l-4 border-industrial-500">
+                <label class="block text-sm font-bold text-slate-700 mb-2">📍 Select Current Active Site:</label>
+                <div class="flex gap-2">
+                    <select id="activeSiteSelect" onchange="updateSiteNavigation()" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-industrial-500">
+                        <option value="">-- Choose Site --</option>
+                    </select>
+                    <a id="navLinkBtn" href="#" target="_blank" class="bg-slate-200 text-slate-500 pointer-events-none px-4 py-3 rounded-lg font-bold flex items-center justify-center gap-1 transition">
+                        🗺️ Map
+                    </a>
+                </div>
+            </div>
+
+            <!-- Worker Identification -->
+            <div class="bg-white rounded-xl shadow-md p-5">
+                <label class="block text-sm font-bold text-slate-700 mb-2">👷 Operative Name:</label>
+                <select id="workerNameSelect" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-industrial-500">
+                    <option value="">-- Select Your Name --</option>
+                    <option value="Ryan (Director)">Ryan (Director)</option>
+                    <option value="Dave (Foreman)">Dave (Foreman)</option>
+                    <option value="Pete (Operative)">Pete (Operative)</option>
+                    <option value="Kev (Operative)">Kev (Operative)</option>
+                    <option value="Tom (Plant Op)">Tom (Plant Op)</option>
+                </select>
+            </div>
+
+            <!-- Big Touch-Friendly Action Buttons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Progress Photo & Update -->
+                <button onclick="openModal('photoModal')" class="bg-white hover:bg-industrial-50 border-2 border-slate-200 hover:border-industrial-500 rounded-2xl p-6 text-left shadow-md transition group flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-industrial-100 text-industrial-600 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
+                        📸
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Progress Photo</h3>
+                        <p class="text-xs text-slate-500 mt-1">Snap work progress, trench depth, or site condition.</p>
+                    </div>
+                </button>
+
+                <!-- HSE Form & Sign-off -->
+                <button onclick="openModal('hseModal')" class="bg-white hover:bg-industrial-50 border-2 border-slate-200 hover:border-industrial-500 rounded-2xl p-6 text-left shadow-md transition group flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
+                        ✍️
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">HSE & RAMS Sign-Off</h3>
+                        <p class="text-xs text-slate-500 mt-1">Daily briefing, RAMS check & digital signature.</p>
+                    </div>
+                </button>
+
+                <!-- Issue / Near Miss -->
+                <button onclick="openModal('issueModal')" class="bg-white hover:bg-rose-50 border-2 border-slate-200 hover:border-rose-400 rounded-2xl p-6 text-left shadow-md transition group flex items-center gap-4 md:col-span-2">
+                    <div class="w-14 h-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-2xl group-hover:scale-110 transition shrink-0">
+                        ⚠️
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Report Issue / Near-Miss</h3>
+                        <p class="text-xs text-slate-500 mt-1">Flag utility strikes, ground slippage, or equipment faults instantly.</p>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Office Hub Dashboard (Hidden until PIN entered) -->
+        <div id="officeHubView" class="hidden space-y-6">
+            <div class="flex justify-between items-center bg-industrial-dark text-white p-4 rounded-xl shadow">
+                <h2 class="text-lg font-bold flex items-center gap-2"><span>📊</span> Office Control Panel</h2>
+                <button onclick="lockOfficeHub()" class="bg-slate-700 hover:bg-slate-600 text-xs px-3 py-1.5 rounded font-bold transition">Lock Hub</button>
+            </div>
+
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-slate-300 gap-2">
+                <button onclick="switchTab('submissionsTab')" id="btnSubmissionsTab" class="px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm">Incoming Feed</button>
+                <button onclick="switchTab('sitesTab')" id="btnSitesTab" class="px-4 py-2 font-bold text-slate-500 text-sm">Manage Sites</button>
+            </div>
+
+            <!-- Submissions Feed Tab -->
+            <div id="submissionsTab" class="space-y-4">
+                <div class="bg-white p-4 rounded-xl shadow flex flex-col md:flex-row gap-3 justify-between items-center">
+                    <span class="text-sm font-bold text-slate-700">Filter Submissions:</span>
+                    <select id="filterSite" onchange="renderSubmissions()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="ALL">All Sites</option>
+                    </select>
+                </div>
+                <div id="submissionsList" class="space-y-3">
+                    <!-- Dynamic submission cards injected here -->
+                </div>
+            </div>
+
+            <!-- Manage Sites Tab -->
+            <div id="sitesTab" class="hidden space-y-4">
+                <div class="bg-white p-5 rounded-xl shadow space-y-4">
+                    <h3 class="font-bold text-slate-800">Add New Groundworks Site</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Site Name / Plot Reference:</label>
+                            <input type="text" id="newSiteName" placeholder="e.g., Lord Street Development" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-industrial-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1">Google Maps Link or Full Address:</label>
+                            <input type="text" id="newSiteMap" placeholder="Paste Google Maps URL or Postcode" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-industrial-500">
+                        </div>
+                        <button onclick="addNewSite()" class="w-full bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-lg text-sm shadow transition">
+                            Save & Add Site
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl shadow">
+                    <h3 class="font-bold text-slate-800 mb-3">Active Sites List</h3>
+                    <div id="adminSitesList" class="space-y-2">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: PIN Entry -->
+    <div id="pinModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800 text-center">Enter Office PIN</h3>
+            <p class="text-xs text-slate-500 text-center">Default PIN is <code class="bg-slate-100 px-1.5 py-0.5 rounded font-bold text-industrial-600">1234</code></p>
+            <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-full text-center tracking-widest text-2xl border border-slate-300 rounded-xl py-3 focus:ring-2 focus:ring-industrial-500">
+            <div class="flex gap-2">
+                <button onclick="closeModal('pinModal')" class="flex-1 bg-slate-200 hover:bg-slate-300 font-bold py-2.5 rounded-xl text-sm transition">Cancel</button>
+                <button onclick="verifyPin()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow transition">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Progress Photo -->
+    <div id="photoModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800">📸 Submit Progress Photo</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Take or Upload Photo:</label>
+                    <input type="file" accept="image/*" id="photoFileInput" class="w-full border border-slate-300 rounded-lg p-2 text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Work Description / Notes:</label>
+                    <textarea id="photoNotes" rows="3" placeholder="e.g., Completed 150mm foul drainage run to manhole 3." class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-industrial-500"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('photoModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitProgressPhoto()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">Send to Office</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: HSE Form -->
+    <div id="hseModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-slate-800">✍️ Daily HSE & RAMS Sign-Off</h3>
+            <div class="space-y-3 text-sm">
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse1" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>RAMS read and understood for today's tasks.</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse2" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>Excavation/Trench shoring and CAT & Genny checks completed.</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border">
+                    <input type="checkbox" id="hse3" class="w-4 h-4 text-industrial-500 rounded">
+                    <span>PPE worn correctly (Hi-Vis, boots, hard hat, glasses).</span>
+                </label>
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Digital Signature (Type Full Name):</label>
+                    <input type="text" id="hseSignName" placeholder="Signer Name" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm">
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('hseModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitHSEForm()" class="flex-1 bg-industrial-500 hover:bg-industrial-600 text-white font-bold py-2.5 rounded-xl text-sm shadow">Sign & Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Issue / Near-Miss -->
+    <div id="issueModal" class="fixed inset-0 bg-black/60 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <h3 class="text-lg font-bold text-rose-600">⚠️ Report Issue / Near-Miss</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1">Describe Issue:</label>
+                    <textarea id="issueNotes" rows="3" placeholder="Describe hazard, service strike risk, or plant fault..." class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-rose-500"></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="closeModal('issueModal')" class="flex-1 bg-slate-200 font-bold py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onclick="submitIssue()" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-sm shadow">Send Urgent Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Initial Mock Data / LocalStorage State
+        let sites = JSON.parse(localStorage.getItem('rhp3_sites')) || [
+            { name: "Lord Street Development", map: "https://maps.google.com" },
+            { name: "Plot 4 Drainage Run", map: "https://maps.google.com" }
+        ];
+
+        let submissions = JSON.parse(localStorage.getItem('rhp3_submissions')) || [];
+        const officePin = "1234";
+
+        // Initialize app on load
+        window.onload = function() {
+            populateSitesDropdown();
+            renderAdminSites();
+            renderSubmissions();
+        };
+
+        function populateSitesDropdown() {
+            const select = document.getElementById('activeSiteSelect');
+            const filter = document.getElementById('filterSite');
+            
+            let siteOpts = '<option value="">-- Choose Site --</option>';
+            let filterOpts = '<option value="ALL">All Sites</option>';
+
+            sites.forEach(s => {
+                siteOpts += `<option value="${s.name}">${s.name}</option>`;
+                filterOpts += `<option value="${s.name}">${s.name}</option>`;
+            });
+
+            select.innerHTML = siteOpts;
+            filter.innerHTML = filterOpts;
+        }
+
+        function updateSiteNavigation() {
+            const selectedName = document.getElementById('activeSiteSelect').value;
+            const navBtn = document.getElementById('navLinkBtn');
+            const found = sites.find(s => s.name === selectedName);
+
+            if (found && found.map) {
+                navBtn.href = found.map.startsWith('http') ? found.map : `https://maps.google.com/?q=${encodeURIComponent(found.map)}`;
+                navBtn.classList.remove('bg-slate-200', 'text-slate-500', 'pointer-events-none');
+                navBtn.classList.add('bg-industrial-500', 'text-white');
+            } else {
+                navBtn.href = "#";
+                navBtn.classList.add('bg-slate-200', 'text-slate-500', 'pointer-events-none');
+                navBtn.classList.remove('bg-industrial-500', 'text-white');
+            }
+        }
+
+        function checkWorkerAndSite() {
+            const worker = document.getElementById('workerNameSelect').value;
+            const site = document.getElementById('activeSiteSelect').value;
+            if (!worker) {
+                alert("Please select your worker name first.");
+                return false;
+            }
+            if (!site) {
+                alert("Please select the active site first.");
+                return false;
+            }
+            return { worker, site };
+        }
+
+        // Modal Controls
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); document.getElementById(id).classList.add('flex'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); document.getElementById(id).classList.remove('flex'); }
+
+        // PIN & Office Hub
+        function openAdminModal() { openModal('pinModal'); }
+        function verifyPin() {
+            const val = document.getElementById('pinInput').value;
+            if (val === officePin) {
+                closeModal('pinModal');
+                document.getElementById('pinInput').value = '';
+                document.getElementById('fieldAppView').classList.add('hidden');
+                document.getElementById('officeHubView').classList.remove('hidden');
+            } else {
+                alert("Incorrect PIN code.");
+            }
+        }
+        function lockOfficeHub() {
+            document.getElementById('officeHubView').classList.add('hidden');
+            document.getElementById('fieldAppView').classList.remove('hidden');
+        }
+
+        // Tabs in Office Hub
+        function switchTab(tabId) {
+            document.getElementById('submissionsTab').classList.add('hidden');
+            document.getElementById('sitesTab').classList.add('hidden');
+            document.getElementById('btnSubmissionsTab').className = "px-4 py-2 font-bold text-slate-500 text-sm";
+            document.getElementById('btnSitesTab').className = "px-4 py-2 font-bold text-slate-500 text-sm";
+
+            document.getElementById(tabId).classList.remove('hidden');
+            if(tabId === 'submissionsTab') {
+                document.getElementById('btnSubmissionsTab').className = "px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm";
+                renderSubmissions();
+            } else {
+                document.getElementById('btnSitesTab').className = "px-4 py-2 font-bold text-industrial-600 border-b-2 border-industrial-500 text-sm";
+                renderAdminSites();
+            }
+        }
+
+        // Submissions Logic
+        function saveSubmission(type, details) {
+            const check = checkWorkerAndSite();
+            if (!check) return false;
+
+            const record = {
+                id: Date.now(),
+                type: type,
+                worker: check.worker,
+                site: check.site,
+                time: new Date().toLocaleString(),
+                details: details
+            };
+
+            submissions.unshift(record);
+            localStorage.setItem('rhp3_submissions', JSON.stringify(submissions));
+            alert("Successfully sent to RHP3 Office Hub!");
+            return true;
+        }
+
+        function submitProgressPhoto() {
+            const notes = document.getElementById('photoNotes').value;
+            if(saveSubmission('Progress Photo', notes || 'Progress photo submitted')) {
+                document.getElementById('photoNotes').value = '';
+                closeModal('photoModal');
+            }
+        }
+
+        function submitHSEForm() {
+            const signer = document.getElementById('hseSignName').value;
+            if(!signer) { alert("Please type your name for digital signature."); return; }
+            if(saveSubmission('HSE Sign-Off', `RAMS & Safety Checked. Signed by: ${signer}`)) {
+                document.getElementById('hseSignName').value = '';
+                document.getElementById('hse1').checked = false;
+                document.getElementById('hse2').checked = false;
+                document.getElementById('hse3').checked = false;
+                closeModal('hseModal');
+            }
+        }
+
+        function submitIssue() {
+            const notes = document.getElementById('issueNotes').value;
+            if(!notes) { alert("Please describe the issue."); return; }
+            if(saveSubmission('URGENT ISSUE', notes)) {
+                document.getElementById('issueNotes').value = '';
+                closeModal('issueModal');
+            }
+        }
+
+        function renderSubmissions() {
+            const container = document.getElementById('submissionsList');
+            const filter = document.getElementById('filterSite').value;
+            
+            let filtered = submissions;
+            if(filter !== 'ALL') {
+                filtered = submissions.filter(s => s.site === filter);
+            }
+
+            if(filtered.length === 0) {
+                container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow text-center text-slate-400 text-sm">No submissions recorded yet.</div>`;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(item => {
+                const badgeColor = item.type === 'URGENT ISSUE' ? 'bg-rose-100 text-rose-700 border-rose-300' : 'bg-industrial-100 text-industrial-700 border-industrial-300';
+                html += `
+                    <div class="bg-white p-4 rounded-xl shadow border-l-4 ${item.type === 'URGENT ISSUE' ? 'border-rose-500' : 'border-industrial-500'} space-y-2">
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold px-2 py-0.5 rounded border ${badgeColor}">${item.type}</span>
+                            <span class="text-xs text-slate-400">${item.time}</span>
+                        </div>
+                        <div class="text-sm font-bold text-slate-800">📍 ${item.site}</div>
+                        <div class="text-sm text-slate-600 bg-slate-50 p-2.5 rounded">${item.details}</div>
+                        <div class="text-xs font-medium text-slate-500">👷 Submitted by: <strong class="text-slate-700">${item.worker}</strong></div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // Site Management Logic
+        function addNewSite() {
+            const name = document.getElementById('newSiteName').value.trim();
+            const map = document.getElementById('newSiteMap').value.trim();
+            if(!name) { alert("Please enter a site name."); return; }
+
+            sites.push({ name, map });
+            localStorage.setItem('rhp3_sites', JSON.stringify(sites));
+            document.getElementById('newSiteName').value = '';
+            document.getElementById('newSiteMap').value = '';
+            populateSitesDropdown();
+            renderAdminSites();
+            alert("Site added successfully!");
+        }
+
+        function renderAdminSites() {
+            const container = document.getElementById('adminSitesList');
+            if(sites.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400">No active sites configured.</p>`;
+                return;
+            }
+            let html = '';
+            sites.forEach((s, index) => {
+                html += `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border text-sm">
+                        <div>
+                            <strong class="text-slate-800">${s.name}</strong>
+                            <div class="text-xs text-slate-400 truncate max-w-xs">${s.map || 'No map link'}</div>
+                        </div>
+                        <button onclick="deleteSite(${index})" class="text-rose-500 hover:text-rose-700 font-bold text-xs px-2 py-1">Remove</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteSite(index) {
+            if(confirm("Remove this site?")) {
+                sites.splice(index, 1);
+                localStorage.setItem('rhp3_sites', JSON.stringify(sites));
+                populateSitesDropdown();
+                renderAdminSites();
+            }
+        }
+    </script>
+</body>
+</html>
